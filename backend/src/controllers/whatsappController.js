@@ -388,7 +388,7 @@ async function generateQuotationAndSend(lead, phoneNumber, session) {
     // Schedule first follow-up
     await pool.query(
       `INSERT INTO followups (lead_id, quotation_id, followup_type, channel, message, scheduled_at)
-       VALUES ($1, $2, 'auto', 'whatsapp', $3, datetime('now', '+1 day'))`,
+       VALUES ($1, $2, 'auto', 'whatsapp', $3, CURRENT_TIMESTAMP + INTERVAL '1 day')`,
       [lead.id, quotation.id, followupMessage(1, lead.customer_name)]
     );
 

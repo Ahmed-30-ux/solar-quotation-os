@@ -111,7 +111,7 @@ class FollowUpScheduler {
     for (const f of followupMessages) {
       await pool.query(
         `INSERT INTO followups (lead_id, quotation_id, followup_type, channel, message, scheduled_at)
-         VALUES ($1, $2, 'auto', 'whatsapp', $3, datetime('now', '+' || $4 || ' days'))`,
+         VALUES ($1, $2, 'auto', 'whatsapp', $3, CURRENT_TIMESTAMP + ($4 || ' days')::interval)`,
         [leadId, quotationId, f.message, f.day]
       );
     }

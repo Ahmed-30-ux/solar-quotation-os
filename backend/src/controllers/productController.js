@@ -123,7 +123,7 @@ exports.getAll = async (req, res) => {
 
     if (search) {
       paramCount++;
-      query += ` AND (p.name LIKE $${paramCount} OR p.brand LIKE $${paramCount} OR p.model LIKE $${paramCount})`;
+      query += ` AND (p.name ILIKE $${paramCount} OR p.brand ILIKE $${paramCount} OR p.model ILIKE $${paramCount})`;
       params.push(`%${search}%`);
     }
 

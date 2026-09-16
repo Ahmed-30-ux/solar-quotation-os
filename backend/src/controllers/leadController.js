@@ -32,7 +32,7 @@ exports.getAll = async (req, res) => {
 
     if (search) {
       paramCount++;
-      query += ` AND (l.customer_name LIKE $${paramCount} OR l.customer_phone LIKE $${paramCount} OR l.customer_email LIKE $${paramCount})`;
+      query += ` AND (l.customer_name ILIKE $${paramCount} OR l.customer_phone ILIKE $${paramCount} OR l.customer_email ILIKE $${paramCount})`;
       params.push(`%${search}%`);
     }
 

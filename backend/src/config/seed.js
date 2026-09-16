@@ -119,7 +119,7 @@ async function seed() {
       `INSERT INTO quotation_templates (company_id, name, terms_conditions, validity_days, is_default)
        VALUES ($1, 'Standard Template',
        '1. This quotation is valid for 15 days from the date of issue.\n2. 50% advance payment required to proceed.\n3. Installation will be completed within 3-5 working days after advance payment.\n4. Panels carry 25-year performance warranty, inverter 10 years, battery 10 years.\n5. Net metering assistance included.\n6. Prices are subject to change after the validity period.',
-       15, 1)`,
+       15, true)`,
       [companyId]
     );
     console.log('  Quotation template created');
@@ -152,7 +152,7 @@ async function seed() {
           companyId, data.assignee.id, data.name,
           '+92 3' + String(10000000 + Math.floor(Math.random() * 89999999)).substring(0, 9),
           data.city, data.consumption, data.type, 1200,
-          500000, 2000000, data.type !== 'on_grid' ? 1 : 0,
+          500000, 2000000, data.type !== 'on_grid',
           '2 AC, Fridge, Washer, Water Pump',
           data.status, data.quote || null, data.lost_reason || null, temperature
         ]

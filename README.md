@@ -7,25 +7,32 @@ Quotation management for solar installers. Manage leads, configure products and 
 | Layer | Tech |
 |---|---|
 | Frontend | React 18, Vite, Tailwind CSS |
-| Backend | Node.js, Express, SQLite (`node:sqlite`) |
-| Database | SQLite file (`backend/data/solar.db`), WAL mode |
+| Backend | Node.js, Express |
+| Database | PostgreSQL 15+, managed (Neon/Supabase) or self-hosted |
 | PDFs | PDFKit (server-rendered, A4) |
 
 ## Requirements
 
-- **Node.js 26+** — `node:sqlite` (the built-in `DatabaseSync`) is required; older versions will not work.
+- **Node.js 20+**
+- **A PostgreSQL database** — the app reads `DATABASE_URL`. Free managed option: [Neon](https://neon.tech) (a project gives you a connection string; it also keeps 7 days of automatic point-in-time backups).
 
 ## Setup
 
+1. Create a Neon project and copy its connection string.
+2. Configure the backend:
+
 ```bash
-# Backend
 cd backend
 npm install
 copy .env.example .env        # Windows — adjust as needed
+# In .env, set:  DATABASE_URL=postgresql://...
 npm run migrate               # create tables
 npm run seed                  # load demo data (fresh DB only)
+```
 
-# Frontend
+3. Frontend:
+
+```bash
 cd frontend
 npm install
 ```
@@ -56,7 +63,8 @@ Demo accounts (from `npm run seed`):
 | Var | Default | Purpose |
 |---|---|---|
 | `PORT` | `5000` | Backend port |
-| `DB_PATH` | `backend/data/solar.db` | SQLite file location |
+| `DATABASE_URL` | — | **PostgreSQL connection string (required)** |
+| `DATABASE_SSL` | `true` | Set `false` for a local Postgres without SSL |
 | `JWT_SECRET` | — | **Change this before any real use** |
 | `JWT_EXPIRES_IN` | `7d` | Token lifetime |
 | `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_VERIFY_TOKEN` | `test` | WhatsApp Cloud API credentials; placeholders = messaging disabled |
@@ -70,7 +78,7 @@ cd backend
 npm test        # node --test — 25 tests: auth, leads, quotations/PDF, roles, CSV import
 ```
 
-Tests run against a temporary DB (`DB_PATH` override), so they never touch `solar.db`.
+Each test run uses its own throwaway schema (`sqos_test_*`) on your `DATABASE_URL`, created on boot and dropped on close. Your data is never touched.
 
 ## Backup
 
@@ -79,7 +87,7 @@ cd backend
 npm run backup
 ```
 
-Writes a consistent snapshot to `backend/backups/` using SQLite `serialize()`. Safe to run while the server is live.
+Runs `pg_dump` (PostgreSQL client tools) to `backend/backups/solar-<timestamp>.sql`. On Neon, backups are also automatic via point-in-time restore (7 days on the free tier).
 
 ## Product CSV Import
 
@@ -115,11 +123,10 @@ Under **Settings → Company Profile** you can upload a logo (PNG/JPG ≤ 1 MB) 
 
 ## Deferred / Roadmap
 
-- **Deployment** — host on Railway/Render free tier with a persistent volume for `backend/data/`.
+- **Deployment** — host backend + built frontend on Render/Railway free tier and point `DATABASE_URL` at Neon.
 - **Real WhatsApp Cloud API** — set credentials in `.env`; inbound webhook (`/api/whatsapp/webhook`) is already wired with HMAC verification.
 - **Billing / payments** — not yet implemented.
 
 ## Notes
 
-- Requires Node 26+ for `node:sqlite`; do not downgrade to `sql.js`.
 - PowerShell 5.1: use `curl.exe -F` (no `-F` on `Invoke-RestMethod`) and quote globs in `npm test`.

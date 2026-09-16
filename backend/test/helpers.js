@@ -1,12 +1,27 @@
-const os = require('os');
-const path = require('path');
-const fs = require('fs');
+require('dotenv').config();
+const crypto = require('crypto');
+const { Pool } = require('pg');
 
-const DB_PATH = process.env.DB_PATH;
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error('DATABASE_URL is required to run tests. See backend/.env.example');
+}
+
+const sslConfig = process.env.DATABASE_SSL === 'false'
+  ? false
+  : { rejectUnauthorized: false };
 
 async function boot() {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'solar-os-test-'));
-  process.env.DB_PATH = path.join(tmpDir, 'test.db');
+  const schema = 'sqos_test_' + crypto.randomBytes(4).toString('hex');
+
+  // Create the isolated schema first (using the default search_path), since a
+  // search_path pointing at a nonexistent schema leaves no creation target.
+  const setup = new Pool({ connectionString, ssl: sslConfig, max: 1 });
+  await setup.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`);
+  await setup.end();
+
+  // Each test run gets an isolated schema via the pool's startup options.
+  process.env.PGOPTIONS = `-c search_path=${schema}`;
   process.env.NODE_ENV = 'test';
   process.env.JWT_SECRET = 'test-secret-key';
   process.env.JWT_EXPIRES_IN = '1h';
@@ -31,9 +46,10 @@ async function boot() {
     async close() {
       server.close();
       await new Promise((resolve) => server.close(resolve));
-      try {
-        fs.rmSync(tmpDir, { recursive: true, force: true });
-      } catch (_) {}
+      await db.end().catch(() => {});
+      const cleanup = new Pool({ connectionString, ssl: sslConfig, max: 1 });
+      await cleanup.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`).catch(() => {});
+      await cleanup.end().catch(() => {});
     },
   };
 }

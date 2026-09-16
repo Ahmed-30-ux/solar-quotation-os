@@ -1,28 +1,31 @@
+require('dotenv').config();
+const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { DatabaseSync } = require('node:sqlite');
 
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, '..', 'data', 'solar.db');
+const DATABASE_URL = process.env.DATABASE_URL;
 const BACKUP_DIR = process.env.BACKUP_DIR || path.join(__dirname, '..', 'backups');
 
-if (!fs.existsSync(DB_PATH)) {
-  console.error(`Database not found at ${DB_PATH}`);
+if (!DATABASE_URL) {
+  console.error('DATABASE_URL is not set. See backend/.env.example');
   process.exit(1);
 }
 
 if (!fs.existsSync(BACKUP_DIR)) fs.mkdirSync(BACKUP_DIR, { recursive: true });
 
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-const dest = path.join(BACKUP_DIR, `solar-${stamp}.db`);
+const dest = path.join(BACKUP_DIR, `solar-${stamp}.sql`);
 
 try {
-  const db = new DatabaseSync(DB_PATH, { readOnly: true });
-  const snapshot = db.serialize();
-  fs.writeFileSync(dest, snapshot);
-  db.close();
-  console.log(`Backup written: ${dest} (${snapshot.byteLength} bytes)`);
+  execSync(`pg_dump --dbname="${DATABASE_URL}" --no-owner --no-privileges --format=plain > "${dest}"`, { stdio: 'inherit' });
+  const size = fs.statSync(dest).size;
+  console.log(`Backup written: ${dest} (${size} bytes)`);
 } catch (err) {
-  // Fallback: plain file copy
-  fs.copyFileSync(DB_PATH, dest);
-  console.log(`Backup written (copy fallback): ${dest}`);
+  if (err.code === 'ENOENT' || /not recognized|not found/i.test(err.message || '')) {
+    console.log('pg_dump not found. Install PostgreSQL client tools to use this script.');
+    console.log('Production backups on Neon are automatic (point-in-time restore, 7 days on free tier).');
+    process.exit(0);
+  }
+  console.error('Backup failed:', err.message);
+  process.exit(1);
 }
