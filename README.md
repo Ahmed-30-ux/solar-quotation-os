@@ -40,11 +40,11 @@ npm install
 ## Run
 
 ```bash
-# Terminal 1 — backend on :5000
+# Terminal 1 — backend on :5010 (matches the Vite proxy; change PORT freely)
 cd backend
 npm run dev                   # nodemon
 
-# Terminal 2 — frontend on :3000 (proxies /api to :5000)
+# Terminal 2 — frontend on :3000 (proxies /api to :5010)
 cd frontend
 npm run dev
 ```
@@ -121,9 +121,28 @@ Installation & Commissioning,kW,10000,8000,Service,INSTALL,Services
 
 Under **Settings → Company Profile** you can upload a logo (PNG/JPG ≤ 1 MB) and pick a brand color. Both are applied to generated PDFs: the logo renders in the header and the brand color accents the header bar, section headings, and total.
 
+## Deploy (one container = frontend + API)
+
+The app deploys as a **single service**: Express serves the API *and* the built React app (see `Dockerfile`). Works on Railway, Render, or any container host.
+
+1. Create a free **Neon** database and copy its connection string (it looks like `postgresql://neondb_owner:...@ep-xxx.aws.neon.tech/neondb?sslmode=require`).
+2. Build the frontend into the image (the Dockerfile does this) — no separate static hosting needed.
+3. On **Railway**: connect the repo (`railway link`) then `railway up` (uses the root `Dockerfile`), or push to GitHub and create a service from it. Set these variables on the service:
+   - `DATABASE_URL` — your Neon connection string (add `?sslmode=require`)
+   - `JWT_SECRET` — a long random string
+   - `NODE_ENV=production`
+4. Once it's live, run migrations/seed against Neon once, from anywhere:
+
+```bash
+cd backend
+DATABASE_URL="<your neon url>" npm run migrate
+DATABASE_URL="<your neon url>" npm run seed    # demo data only
+```
+
+The service uses the `PORT` env var provided by the host (no port is hard-coded for Rails/Render). Healthcheck: `/api/health`.
+
 ## Deferred / Roadmap
 
-- **Deployment** — host backend + built frontend on Render/Railway free tier and point `DATABASE_URL` at Neon.
 - **Real WhatsApp Cloud API** — set credentials in `.env`; inbound webhook (`/api/whatsapp/webhook`) is already wired with HMAC verification.
 - **Billing / payments** — not yet implemented.
 

@@ -4,6 +4,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const crypto = require('crypto');
+const path = require('path');
+const fs = require('fs');
 
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
@@ -41,6 +43,13 @@ app.use('/api/settings', settingsRoutes);
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Serve the built frontend (single-service deploy). Inactive during local dev.
+const distPath = path.join(__dirname, '..', '..', 'frontend', 'dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get(/^(?!\/api\/).*/, (req, res) => res.sendFile(path.join(distPath, 'index.html')));
+}
 
 // Error handler
 app.use((err, req, res, next) => {
