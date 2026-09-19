@@ -1,6 +1,19 @@
 # Solar Quotation OS
 
+[![Deploy](https://github.com/Ahmed-30-ux/solar-quotation-os/actions/workflows/deploy.yml/badge.svg)](https://github.com/Ahmed-30-ux/solar-quotation-os/actions/workflows/deploy.yml)
+
 Quotation management for solar installers. Manage leads, configure products and pricing, generate branded PDF quotations (PKR), and track follow-ups. Built for the Pakistan solar market.
+
+## Live
+
+**https://173.212.211.175** — production app (nginx :80 → backend :5010), PostgreSQL 16, auto-deployed from `main`.
+
+Demo accounts (from `npm run seed`):
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | `admin@sunpeak.pk` | `admin123` |
+| Salesperson | `sales1@sunpeak.pk` | `sales123` |
 
 ## Stack
 
@@ -140,6 +153,29 @@ DATABASE_URL="<your neon url>" npm run seed    # demo data only
 ```
 
 The service uses the `PORT` env var provided by the host (no port is hard-coded for Rails/Render). Healthcheck: `/api/health`.
+
+## CI/CD pipeline (`.github/workflows/deploy.yml`)
+
+Every push to `main` runs a two-stage pipeline:
+
+```mermaid
+flowchart LR
+    Push[Push to main] --> Test[Test job]
+    Test -->|Postgres 16 service container| npm[backend npm test]
+    npm -->|all 25 tests green| Deploy[Deploy job]
+    Deploy -->|SSH deploy key| VPS[VPS /opt/solar/deploy.sh]
+    VPS --> Git[git pull] --> NpmCI[npm ci backend]
+    NpmCI --> Vite[vite build frontend]
+    Vite --> Migrate[node migrate] --> Restart[systemctl restart solar-quotation]
+    Restart -->|/api/health check| Done[DEPLOY_OK]
+```
+
+1. **Test** — boots a real PostgreSQL 16 service container, installs backend deps (`npm ci`), and runs the suite `npm test` (auth, leads, quotations; ~25 tests).
+2. **Deploy** — only runs after tests pass and only on `main`. SSHes in with the dedicated `solar_deploy_ed25519` key (`VPS_SSH_KEY` secret) and runs `/opt/solar/deploy.sh`: `git pull` → `npm ci` backend → `vite build` frontend → `migrate` → restart `solar-quotation.service` → health-check `/api/health`.
+
+**Required repo secrets:** `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY` (private key of `solar_deploy_ed25519`; the public key is in `/root/.ssh/authorized_keys` on the VPS).
+
+Pull requests also run the **Test** job automatically — deploy is skipped.
 
 ## Deferred / Roadmap
 
