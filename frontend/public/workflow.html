@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SunPeak Solar — Solar Quotation OS Workflow</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f6fbf4; color: #333; line-height: 1.7; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+
+    /* Header */
+    .header { text-align: center; padding: 60px 20px 40px; background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; border-radius: 16px; margin-bottom: 40px; }
+    .header h1 { font-size: 36px; letter-spacing: 2px; margin-bottom: 8px; }
+    .header p { font-size: 16px; opacity: 0.92; }
+    .header .badge { display: inline-block; margin-top: 12px; padding: 4px 16px; background: rgba(255,255,255,0.2); border-radius: 20px; font-size: 13px; }
+
+    /* Sections */
+    .section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .section h2 { font-size: 22px; color: #2e7d32; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e8f5e9; }
+    .section h3 { font-size: 17px; color: #33691e; margin: 20px 0 10px; }
+    .section p { margin-bottom: 12px; color: #555; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+    th { background: #e8f5e9; color: #33691e; padding: 10px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #c8e6c9; }
+    td { padding: 10px 12px; border-bottom: 1px solid #f0f5ee; }
+    tr:hover td { background: #f6fbf4; }
+
+    /* Status badges */
+    .done { background: #d4edda; color: #155724; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .ready { background: #fff3cd; color: #856404; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+
+    /* Flow diagrams */
+    .flow { background: #f6fbf4; border: 1px solid #c8e6c9; border-radius: 10px; padding: 20px; margin: 16px 0; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8; white-space: pre-wrap; overflow-x: auto; }
+
+    /* Role cards */
+    .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 16px 0; }
+    .role-card { background: #f6fbf4; border: 1px solid #c8e6c9; border-radius: 10px; padding: 20px; text-align: center; }
+    .role-card h4 { color: #2e7d32; font-size: 18px; margin-bottom: 8px; }
+    .role-card .icon { font-size: 32px; margin-bottom: 8px; }
+    .role-card ul { text-align: left; font-size: 13px; color: #666; list-style: none; padding: 0; }
+    .role-card ul li { padding: 3px 0; }
+    .role-card ul li::before { content: "✓ "; color: #2e7d32; font-weight: bold; }
+
+    /* Feature grid */
+    .features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 16px 0; }
+    .feature { background: #f6fbf4; border: 1px solid #c8e6c9; border-radius: 10px; padding: 20px; }
+    .feature h4 { color: #33691e; margin-bottom: 6px; }
+    .feature p { font-size: 13px; color: #888; margin: 0; }
+    .feature .check { color: #f9a825; font-size: 20px; float: right; margin-top: -24px; }
+
+    /* Access diagram */
+    .access-diagram { text-align: center; padding: 30px; background: #f6fbf4; border-radius: 10px; border: 1px solid #c8e6c9; margin: 16px 0; }
+    .devices { display: flex; justify-content: center; gap: 24px; margin: 20px 0; flex-wrap: wrap; }
+    .device { background: white; border: 2px solid #c8e6c9; border-radius: 12px; padding: 16px 24px; text-align: center; min-width: 120px; }
+    .device .icon { font-size: 28px; margin-bottom: 6px; }
+    .device .label { font-size: 12px; color: #888; }
+    .arrow-down { font-size: 24px; color: #f9a825; margin: 12px 0; }
+    .server-box { background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; padding: 16px 32px; border-radius: 12px; display: inline-block; font-weight: 600; }
+
+    /* Print styles */
+    @media print {
+      body { background: white; }
+      .container { padding: 0; }
+      .section { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+      .header { background: #2e7d32 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+
+    @media (max-width: 768px) {
+      .roles { grid-template-columns: 1fr; }
+      .features { grid-template-columns: 1fr; }
+      .header h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>SUNPEAK SOLAR SOLUTIONS</h1>
+    <p>Solar Quotation OS — Business Operating System Workflow</p>
+    <div class="badge">Version 1.0 — September 2026</div>
+  </div>
+
+  <!-- Executive Summary -->
+  <div class="section">
+    <h2>1. Executive Summary</h2>
+    <p>The <strong>Solar Quotation OS</strong> is a cloud-based, centralized platform that manages the complete solar sales cycle — from capturing a lead to generating a professionally branded quotation and following up until the deal is won.</p>
+    <p><strong>One action updates everything automatically.</strong> When a quotation is generated, the system sizes the array from the customer's monthly consumption, selects panels/inverters/batteries, computes equipment + services + margin + tax, calculates monthly savings and payback, marks the lead as <em>Quoted</em>, logs the activity, and makes a branded PDF ready to send — all instantly.</p>
+    <p>The system is accessible from <strong>any device with a browser</strong> — desktop, tablet, or phone — and all users share the same live data.</p>
+  </div>
+
+  <!-- System Architecture -->
+  <div class="section">
+    <h2>2. System Architecture</h2>
+    <div class="flow">
+┌─────────────────────────────────────────────────────────────┐
+│                  SOLAR QUOTATION OS                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐ │
+│  │  Desktop  │   │  Tablet  │   │  Phone   │   │  Remote  │ │
+│  │   Admin   │   │  Sales   │   │  Sales   │   │ Partner  │ │
+│  └─────┬────┘   └─────┬────┘   └─────┬────┘   └─────┬────┘ │
+│        └──────────────┴──────┬───────┴──────────────┘        │
+│                              │                               │
+│                    ┌─────────▼─────────┐                     │
+│                    │  Express Server  │                     │
+│                    │  JWT Auth + RBAC │                     │
+│                    │  PDFKit (PDFs)    │                     │
+│                    └─────────┬─────────┘                     │
+│                              │                               │
+│                    ┌─────────▼─────────┐                     │
+│                    │ PostgreSQL 16     │                     │
+│                    │ (Daily pg_dump)   │                     │
+│                    └───────────────────┘                     │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │  NGINX (Port 80) → systemd → App (Port 5010)       │    │
+│  │  GitHub Actions: Build → Test → Auto-Deploy         │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘</div>
+
+    <h3>Data Flow — What Happens When a Quotation is Generated</h3>
+    <div class="flow">
+Salesperson clicks [Generate Quotation]
+        │
+        ▼
+  ┌─────────────┐     ┌──────────────┐     ┌──────────────┐
+  │ 1. VALIDATE │ ──→ │ 2. AUTH CHECK│ ──→ │ 3. SIZING    │
+  │  input/zod  │     │  JWT session │     │   ENGINE     │
+  └─────────────┘     └──────────────┘     └──────┬───────┘
+                                                   │
+                    ┌──────────┬──────────┬─────────┼─────────┐
+                    ▼          ▼          ▼         ▼         ▼
+              ┌──────────┐┌────────┐┌─────────┐┌────────┐┌────────┐
+              │ QUOTATION││ QUOTE  ││ LEAD →  ││ PDF    ││ACTIVITY│
+              │ RECORD   ││ ITEMS  ││ QUOTED  ││MADE    ││  LOG   │
+              └──────────┘└────────┘└─────────┘└────────┘└────────┘
+                    │          │          │         │         │
+                    └──────────┴──────────┴─────────┴─────────┘
+                                     │
+                                     ▼
+                            ┌────────────────────┐
+                            │ Monthly Savings &  │
+                            │ Payback computed   │
+                            │ Follow-up scheduled│
+                            │ Dashboard updated  │
+                            └────────────────────┘</div>
+  </div>
+
+  <!-- User Roles -->
+  <div class="section">
+    <h2>3. User Roles & Permissions</h2>
+    <div class="roles">
+      <div class="role-card">
+        <div class="icon">👑</div>
+        <h4>Admin</h4>
+        <ul>
+          <li>Full access to everything</li>
+          <li>Manage products & pricing</li>
+          <li>Configure sizing rules</li>
+          <li>Company profile & branding</li>
+          <li>Team members & settings</li>
+          <li>View all leads & reports</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="icon">🛰️</div>
+        <h4>Salesperson</h4>
+        <ul>
+          <li>Create & manage leads</li>
+          <li>Qualify customers</li>
+          <li>Generate quotations</li>
+          <li>Send branded PDF quotes</li>
+          <li>Schedule follow-ups</li>
+          <li>View their pipeline</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="icon">🤖</div>
+        <h4>Automation</h4>
+        <ul>
+          <li>Follow-up scheduler</li>
+          <li>WhatsApp Cloud API</li>
+          <li>Inbound webhook (HMAC)</li>
+          <li>Low-stock & reminders</li>
+          <li>Daily backups</li>
+          <li>System health checks</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lead Workflow -->
+  <div class="section">
+    <h2>4. Lead Management Workflow</h2>
+    <p>The lead pipeline mirrors how a solar sale actually happens — qualify first, size only when the customer qualifies, quote, then follow up until close.</p>
+
+    <h3>Step 1: Capture a Lead</h3>
+    <div class="flow">
+Salesperson taps [New Lead]
+        │
+        ▼
+┌─────────────────────────────────────────┐
+│  CUSTOMER DETAILS                        │
+│  Name: Ahmed Khan                        │
+│  Phone: +92 300 1234567                  │
+│  Email: ahmed@example.pk (optional)      │
+│  City / Roof area: Lahore / 150 m²      │
+├─────────────────────────────────────────┤
+│  REQUIREMENT                             │
+│  Monthly consumption: 650 kWh            │
+│  System type: ◉ Hybrid ○ On-grid ○ Off   │
+│  Battery required: ☑ Yes                │
+│  Budget range: PKR 1,000,000 – 2,500,000 │
+├─────────────────────────────────────────┤
+│  Lead source: ◉ Walk-in ○ Referral       │
+│  ○ Social Media ○ Website ○ Other       │
+│                                          │
+│  [Create Lead]                           │
+└─────────────────────────────────────────┘
+Auto: activity logged ("Lead created by Ahmed Khan")</div>
+
+    <h3>Step 2: Qualification Status Flow</h3>
+    <div class="flow">
+┌───────┐   ┌──────────────┐   ┌──────────┐   ┌────────┐   ┌────────┐
+│ NEW   │ → │ BILL_UPLOADED│ → │QUALIFYING│ → │QUALIFIED│ → │ QUOTED │
+└───────┘   └──────────────┘   └──────────┘   └────────┘   └────────┘
+   │            │                 │              │             │
+   │            ▼                 ▼              │       ┌────┬────┐
+   │       (customer shares      │              └──────▶│INTERESTED
+   │        electric bill)       │                       └────┬────┘
+   ▼                            ▼                            ▼
+ LOST ────────────────(canceled / no longer qualifies)  ┌NEGOTIATING┐
+                                                         └─────┬─────┘
+                                                      ┌WON┐   ┌LOST┐</div>
+
+    <h3>Step 3: What Happens Automatically</h3>
+    <table>
+      <tr><th>Action</th><th>What Happens</th></tr>
+      <tr><td>Activity log</td><td>Every status change, note, or call recorded with user + timestamp</td></tr>
+      <tr><td>Assignment</td><td>Leads can be assigned to a specific salesperson</td></tr>
+      <tr><td>Temperature / source</td><td>Prioritization and sourcing tracked on every lead</td></tr>
+      <tr><td>CSV import</td><td>Bulk-import leads from a CSV in one step (admin only)</td></tr>
+      <tr><td>Pipeline value</td><td>Quoted amounts roll up into the dashboard funnel</td></tr>
+      <tr><td>Company isolation</td><td>Every company sees only its own leads — multi-tenant by design</td></tr>
+    </table>
+  </div>
+
+  <!-- Quotation Engine -->
+  <div class="section">
+    <h2>5. Quotation Engine</h2>
+    <p>The sizing engine designs a complete solar system from the customer's monthly consumption and your current price list:</p>
+
+    <h3>Step 1: System Sizing</h3>
+    <div class="flow">
+┌─────────────────────────────────────────┐
+│  650 kWh/month ÷ 130 kWh per kW ≈ 5 kW  │
+│  (configurable sizing rules)             │
+│                                          │
+│  585W panels → 10 × 585W = 5.85 kW      │
+│  6kW hybrid inverter (battery-ready)     │
+│  1 MPPT + battery (LiFePO4, hybrid)     │
+│  Mounting structure + wiring + install  │
+│                                          │
+│  SYSTEM SIZE: 5.85 kW   ⚡  ≤ budget?    │
+│  (can be overridden manually)            │
+└─────────────────────────────────────────┘</div>
+
+    <h3>Step 2: What a Generated Quote Contains</h3>
+    <table>
+      <tr><th>Component</th><th>Detail</th></tr>
+      <tr><td>Reference number</td><td>Auto-generated, e.g. <strong>QT-2026-0001</strong>, increments per company</td></tr>
+      <tr><td>Equipment</td><td>Panels, inverter, batteries, mounting — line items from your price list</td></tr>
+      <tr><td>Services</td><td>Installation, wiring, commissioning — with time you don't re-quote</td></tr>
+      <tr><td>Margin</td><td>Configurable margin % on equipment</td></tr>
+      <tr><td>Tax (GST)</td><td>Configurable tax % — shown separately</td></tr>
+      <tr><td>Totals</td><td>Equipment subtotal + services, margin, tax → Total</td></tr>
+      <tr><td>Savings</td><td>Estimated monthly & annual savings based on consumption</td></tr>
+      <tr><td>Payback</td><td>Payback period in years</td></tr>
+      <tr><td>Branding</td><td>Uploaded logo + brand color applied to the PDF (Settings → Company)</td></tr>
+    </table>
+
+    <h3>Step 3: PDF Output</h3>
+    <div class="flow">
+┌───────────────────────────────┐
+│    SUNPEAK SOLAR SOLUTIONS     │
+│   ☀ logo · brand color bar     │
+│  Office 12, Gulberg III · Lahore│
+│  GST: GST-PK-1234567           │
+│───────────────────────────────│
+│  QUOTATION  QT-2026-0001       │
+│  Customer: Ahmed Khan          │
+│  Date: Sep 18, 2026            │
+│───────────────────────────────│
+│  10 × 585W Mono Panels  280,000│
+│  6kW Hybrid Inverter    185,000│
+│  LiFePO4 battery    1,285,000  │
+│  Mounting + wiring       48,000│
+│───────────────────────────────│
+│  Equipment subtotal  1,798,000│
+│  Services subtotal      44,500│
+│  Margin (10%)           45,000│
+│  Tax (5%)               90,271│
+│  ───────────────────────────  │
+│  TOTAL             1,945,771  │
+│  Monthly savings    Rs 87,400 │
+│  Payback             1.9 yrs  │
+└───────────────────────────────┘
+Downloaded as {reference}.pdf — ready to share on WhatsApp</div>
+  </div>
+
+  <!-- Follow-up & WhatsApp -->
+  <div class="section">
+    <h2>6. Follow-ups & WhatsApp</h2>
+    <h3>Scheduled Follow-ups</h3>
+    <div class="flow">
+Quote generated
+        │
+        ▼
+┌─────────────────────────────┐
+│ Follow-up created           │
+│ Lead: Ahmed Khan            │
+│ Due: +3 days ("check-in")   │
+│ Type: WhatsApp / Call       │
+└──────────────┬──────────────┘
+               │ scheduler runs every 5 min
+               ▼
+┌─────────────────────────────┐
+│  When due:                  │
+│  ✓ reminds the assigned     │
+│    salesperson              │
+│  ✓ logs the follow-up done  │
+│  ✓ next follow-up scheduled │
+└─────────────────────────────┘</div>
+
+    <h3>WhatsApp Cloud API (ready to enable)</h3>
+    <table>
+      <tr><th>Capability</th><th>Detail</th></tr>
+      <tr><td>Outbound</td><td>Send quotation PDFs and messages via Graph API (token + phone number ID)</td></tr>
+      <tr><td>Inbound webhook</td><td>POST /api/whatsapp/webhook — HMAC signature verification</td></tr>
+      <tr><td>Sessions</td><td>Per-number session state, resumes interrupted conversations</td></tr>
+      <tr><td>Media</td><td>Receive bill images / documents and attach to the lead</td></tr>
+    </table>
+  </div>
+
+  <!-- Products & Pricing -->
+  <div class="section">
+    <h2>7. Products, Pricing & Rules</h2>
+    <div class="features">
+      <div class="feature">
+        <span class="check">✅</span>
+        <h4>1. Product Catalog</h4>
+        <p>Solar panels, inverters, batteries, accessories, services — with specs (wattage, capacity)</p>
+      </div>
+      <div class="feature">
+        <span class="check">✅</span>
+        <h4>2. Price History</h4>
+        <p>Every price change recorded with timestamps and a full change log</p>
+      </div>
+      <div class="feature">
+        <span class="check">✅</span>
+        <h4>3. Sizing Rules</h4>
+        <p>Consumption → system size mapping, configurable in Settings</p>
+      </div>
+      <div class="feature">
+        <span class="check">✅</span>
+        <h4>4. Quotation Templates</h4>
+        <p>Branded templates reused across quotes</p>
+      </div>
+      <div class="feature">
+        <span class="check">✅</span>
+        <h4>5. Margin & Tax</h4>
+        <p>Configurable margin %, tax (GST) %, and currency (PKR)</p>
+      </div>
+      <div class="feature">
+        <span class="check">✅</span>
+        <h4>6. Branding</h4>
+        <p>Company logo + brand color rendered in every PDF header</p>
+      </div>
+      <div class="feature">
+        <span class="check">✅</span>
+        <h4>7. Team & Roles</h4>
+        <p>Multi-user with admin/salesperson permissions, per-company isolation</p>
+      </div>
+      <div class="feature">
+        <span class="check">✅</span>
+        <h4>8. CSV Import</h4>
+        <p>Bulk lead import from spreadsheet for agencies and campaigns</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Multi-Device Access -->
+  <div class="section">
+    <h2>8. Multi-Device & Remote Access</h2>
+    <div class="access-diagram">
+      <div class="devices">
+        <div class="device">
+          <div class="icon">🖥️</div>
+          <strong>Office PC</strong>
+          <div class="label">Admin & sales desk</div>
+        </div>
+        <div class="device">
+          <div class="icon">📱</div>
+          <strong>Field Tablet</strong>
+          <div class="label">Quotes on site</div>
+        </div>
+        <div class="device">
+          <div class="icon">📲</div>
+          <strong>Salesphone</strong>
+          <div class="label">Follow-ups</div>
+        </div>
+        <div class="device">
+          <div class="icon">💻</div>
+          <strong>Remote Partner</strong>
+          <div class="label">Live pipeline</div>
+        </div>
+      </div>
+      <div class="arrow-down">⬇</div>
+      <div class="server-box">http://173.212.211.175</div>
+      <p style="margin-top:12px;font-size:14px;color:#888;">All devices access the same live PostgreSQL database. No syncing issues.</p>
+    </div>
+  </div>
+
+  <!-- Dashboard & Reports -->
+  <div class="section">
+    <h2>9. Dashboard & Reporting</h2>
+    <table>
+      <tr><th>Metric</th><th>What It Shows</th></tr>
+      <tr><td><strong>Pipeline funnel</strong></td><td>Leads by status: New, Qualifying, Quoted, Negotiating, Won, Lost</td></tr>
+      <tr><td><strong>Pipeline value</strong></td><td>Sum of quoted amounts for all open leads</td></tr>
+      <tr><td><strong>Won value</strong></td><td>Revenue from converted deals</td></tr>
+      <tr><td><strong>Monthly performance</strong></td><td>Total leads, win rate, new business this month</td></tr>
+      <tr><td><strong>Recent activity</strong></td><td>Latest lead actions across the team</td></tr>
+      <tr><td><strong>Quotation PDFs</strong></td><td>Branded PDF export per quote — share directly in WhatsApp</td></tr>
+    </table>
+  </div>
+
+  <!-- Infrastructure -->
+  <div class="section">
+    <h2>10. Infrastructure & Support</h2>
+    <table>
+      <tr><th>Component</th><th>Detail</th></tr>
+      <tr><td>Server</td><td>Contabo VPS (Ubuntu 24.04, 145 GB SSD, 8 GB RAM)</td></tr>
+      <tr><td>App URL</td><td>http://173.212.211.175 (nginx :80 → app :5010)</td></tr>
+      <tr><td>Process Manager</td><td>systemd — auto-restart on crash, under user `solar`</td></tr>
+      <tr><td>Backups</td><td>Daily pg_dump at 02:10, 14-day retention, /opt/solar/backups</td></tr>
+      <tr><td>Auto-Deploy</td><td>Push to GitHub → Build → Test (25 tests) → Deploy in ~30 s</td></tr>
+      <tr><td>Security</td><td>JWT auth, RBAC, bcrypt, helmet headers, nginx rate limiting, fail2ban</td></tr>
+      <tr><td>Monitoring</td><td>Health check every 5 min + disk/memory alerts → /var/log/solar-health.log</td></tr>
+      <tr><td>Support</td><td>Ongoing development team available for issues</td></tr>
+    </table>
+  </div>
+
+  <!-- Login Credentials -->
+  <div class="section">
+    <h2>11. Demo Login Credentials</h2>
+    <table>
+      <tr><th>Role</th><th>Email</th><th>Password</th></tr>
+      <tr><td>Admin</td><td>admin@sunpeak.pk</td><td>admin123</td></tr>
+      <tr><td>Salesperson</td><td>sales1@sunpeak.pk</td><td>sales123</td></tr>
+      <tr><td>Salesperson</td><td>sales2@sunpeak.pk</td><td>sales123</td></tr>
+    </table>
+    <p>Try it now: <a href="http://173.212.211.175" style="color:#2e7d32;font-weight:600;">http://173.212.211.175</a></p>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center;padding:40px;color:#aaa;font-size:13px;">
+    <p>SunPeak Solar Solutions — Solar Quotation OS v1.0</p>
+    <p>Workflow Documentation — September 2026</p>
+  </div>
+
+</div>
+
+</body>
+</html>
