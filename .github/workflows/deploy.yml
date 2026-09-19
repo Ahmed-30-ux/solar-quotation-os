@@ -1,4 +1,4 @@
-name: CI/CD — Test & Deploy
+name: CI/CD — Build, Test & Deploy
 
 on:
   push:
@@ -6,9 +6,31 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  build:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Build production bundle
+        run: npm run build
+
   test:
-    name: Test (Postgres 16)
+    name: Backend tests (Postgres 16)
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -39,16 +61,30 @@ jobs:
           cache-dependency-path: backend/package-lock.json
       - name: Install backend dependencies
         run: npm ci
-      - name: Run test suite (auth, leads, quotations)
-        run: npm test
+      - name: Run backend test suite (auth, leads, quotations)
+        run: npm test 2>&1 | tee /tmp/test-output.txt; exit ${PIPESTATUS[0]}
+      - name: Publish test report to job summary
+        if: always()
+        run: |
+          {
+            echo '## Backend test suite'
+            echo
+            echo 'Suite  : `node --test` against the rest of the test table'
+            echo 'Runner : GitHub-hosted ubuntu-latest'
+            echo 'Database: PostgreSQL 16 service container (per-job)'
+            echo
+            echo '```text'
+            tail -14 /tmp/test-output.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
-    needs: test
+    needs: [build, test]
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Deploy via SSH to ${{ secrets.VPS_HOST }}
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_HOST }}

@@ -156,26 +156,31 @@ The service uses the `PORT` env var provided by the host (no port is hard-coded 
 
 ## CI/CD pipeline (`.github/workflows/deploy.yml`)
 
-Every push to `main` runs a two-stage pipeline:
+Every push to `main` (and every pull request) runs a three-stage pipeline:
 
 ```mermaid
 flowchart LR
-    Push[Push to main] --> Test[Test job]
-    Test -->|Postgres 16 service container| npm[backend npm test]
-    npm -->|all 25 tests green| Deploy[Deploy job]
-    Deploy -->|SSH deploy key| VPS[VPS /opt/solar/deploy.sh]
-    VPS --> Git[git pull] --> NpmCI[npm ci backend]
-    NpmCI --> Vite[vite build frontend]
-    Vite --> Migrate[node migrate] --> Restart[systemctl restart solar-quotation]
-    Restart -->|/api/health check| Done[DEPLOY_OK]
+    Push[Push / PR] --> B[Build job]
+    Push --> T[Test job]
+    B -->|vite build| ok[Bundle OK]
+    T -->|Postgres 16| tests[25+ tests green]
+    ok --> D{on main?}
+    tests --> D
+    D -->|yes| Deploy[Deploy job]
+    D -->|no PR| Skip[deploy skipped]
+    Deploy -->|SSH deploy key| VPS[VPS deploy.sh]
+    VPS --> Git[git pull] --> Migrate[node migrate]
+    Migrate --> Restart[systemctl restart solar-quotation]
+    Restart -->|health check| Done[DEPLOY_OK]
 ```
 
-1. **Test** — boots a real PostgreSQL 16 service container, installs backend deps (`npm ci`), and runs the suite `npm test` (auth, leads, quotations; ~25 tests).
-2. **Deploy** — only runs after tests pass and only on `main`. SSHes in with the dedicated `solar_deploy_ed25519` key (`VPS_SSH_KEY` secret) and runs `/opt/solar/deploy.sh`: `git pull` → `npm ci` backend → `vite build` frontend → `migrate` → restart `solar-quotation.service` → health-check `/api/health`.
+1. **Build** — installs frontend deps (`npm ci`) and compiles the production bundle (`vite build`). Catches compile errors before they ship.
+2. **Test** — boots a real **PostgreSQL 16 service container**, installs backend deps, and runs `npm test` against it (auth, leads, quotations; ~25 tests). A test report is published to the run's **job summary**.
+3. **Deploy** — runs **only if Build + Test pass and only on `main`**. SSHes in with the dedicated `solar_deploy_ed25519` key (`VPS_SSH_KEY` secret) and runs `/opt/solar/deploy.sh`: `git pull` → `npm ci` backend → `vite build` frontend → `migrate` → restart `solar-quotation.service` → health-check `/api/health`.
 
 **Required repo secrets:** `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY` (private key of `solar_deploy_ed25519`; the public key is in `/root/.ssh/authorized_keys` on the VPS).
 
-Pull requests also run the **Test** job automatically — deploy is skipped.
+Pull requests run Build + Test automatically — deploy is skipped.
 
 ## Deferred / Roadmap
 
