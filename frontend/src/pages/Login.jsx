@@ -33,18 +33,19 @@ export default function Login() {
     { icon: 'zap', text: 'Instant solar quotations in seconds' },
     { icon: 'users', text: 'Track every lead through your pipeline' },
     { icon: 'trendUp', text: 'Live pricing, margins and profitability' },
+    { icon: 'sun', text: 'AI-powered system sizing and configuration' },
   ];
 
   return (
-    <div className="min-h-screen flex bg-slate-100">
+    <div className="min-h-screen flex bg-navy-950">
       {/* Brand panel */}
-      <div className="hidden lg:flex w-[46%] flex-col justify-between bg-ink-900 text-white p-12 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 via-transparent to-orange-600/10" />
+      <div className="hidden lg:flex w-[46%] flex-col justify-between bg-surface-1 text-white p-12 relative overflow-hidden border-r border-surface-4">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-orange-600/5" />
         <div className="relative flex items-center gap-3">
           <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
             <Icon name="sun" size={24} strokeWidth={2} />
           </div>
-          <span className="text-lg font-bold tracking-tight">Solar Quotation OS</span>
+          <span className="text-lg font-bold tracking-tight">SolarOS</span>
         </div>
 
         <div className="relative">
@@ -53,14 +54,13 @@ export default function Login() {
             <br />
             Win more deals.
           </h1>
-          <p className="mt-4 text-slate-300 text-[15px] leading-relaxed max-w-md">
-            The sales operating system built for solar companies. Generate professional
-            quotations, manage leads and follow up automatically — all in one place.
+          <p className="mt-4 text-slate-400 text-[15px] leading-relaxed max-w-md">
+            The solar sales operating system. Generate professional quotations, manage leads, configure systems, and close deals — all in one platform.
           </p>
           <ul className="mt-8 space-y-3">
             {features.map((f) => (
-              <li key={f.text} className="flex items-center gap-3 text-sm text-slate-200">
-                <span className="icon-tile w-8 h-8 rounded-lg bg-white/10 text-amber-400">
+              <li key={f.text} className="flex items-center gap-3 text-sm text-slate-300">
+                <span className="icon-tile w-8 h-8 rounded-lg bg-surface-3 text-amber-400">
                   <Icon name={f.icon} size={16} />
                 </span>
                 {f.text}
@@ -69,7 +69,7 @@ export default function Login() {
           </ul>
         </div>
 
-        <p className="relative text-xs text-slate-500">© {new Date().getFullYear()} Solar Quotation OS</p>
+        <p className="relative text-xs text-slate-600">© {new Date().getFullYear()} SolarOS — Solar Quotation Platform</p>
       </div>
 
       {/* Form panel */}
@@ -80,20 +80,20 @@ export default function Login() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-amber-500/30">
                 <Icon name="sun" size={22} strokeWidth={2} />
               </div>
-              <span className="text-lg font-bold text-slate-900 tracking-tight">Solar Quotation OS</span>
+              <span className="text-lg font-bold text-white tracking-tight">SolarOS</span>
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-            {isRegister ? 'Create your company account' : 'Welcome back'}
+          <h2 className="text-2xl font-bold tracking-tight text-white">
+            {isRegister ? 'Create your account' : 'Welcome back'}
           </h2>
-          <p className="mt-1.5 text-sm text-slate-500 mb-7">
+          <p className="mt-1.5 text-sm text-slate-400 mb-7">
             {isRegister ? 'Start quoting in under two minutes.' : 'Sign in to your workspace.'}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="flex items-center gap-2 bg-rose-50 text-rose-700 text-sm px-4 py-3 rounded-xl border border-rose-100">
+              <div className="flex items-center gap-2 bg-rose-500/10 text-rose-400 text-sm px-4 py-3 rounded-xl border border-rose-500/20">
                 <Icon name="alert" size={16} className="shrink-0" />
                 {error}
               </div>
@@ -168,7 +168,7 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => setIsRegister(!isRegister)}
-                className="text-amber-600 hover:text-amber-700 font-semibold"
+                className="text-amber-400 hover:text-amber-300 font-semibold"
               >
                 {isRegister ? 'Sign In' : 'Register'}
               </button>

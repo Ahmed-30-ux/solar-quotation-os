@@ -14,6 +14,7 @@ const quotationRoutes = require('./routes/quotations');
 const dashboardRoutes = require('./routes/dashboard');
 const whatsappRoutes = require('./routes/whatsapp');
 const settingsRoutes = require('./routes/settings');
+const installationRoutes = require('./routes/installations');
 
 const followUpScheduler = require('./services/followUpScheduler');
 
@@ -38,6 +39,7 @@ app.use('/api/quotations', quotationRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/webhooks/whatsapp', whatsappRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/installations', installationRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

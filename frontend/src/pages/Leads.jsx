@@ -86,13 +86,19 @@ export default function Leads() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="page-heading">Leads</h1>
+          <h1 className="page-heading">Leads & CRM</h1>
           <p className="page-sub mt-1">{leads.length} leads total</p>
         </div>
-        <button onClick={() => setShowCreate(!showCreate)} className="btn-brand">
-          <Icon name={showCreate ? 'x' : 'plus'} size={16} />
-          {showCreate ? 'Cancel' : 'New Lead'}
-        </button>
+        <div className="flex items-center gap-3">
+          <a href="/leads/pipeline" className="btn-secondary">
+            <Icon name="columns" size={16} />
+            Pipeline View
+          </a>
+          <button onClick={() => setShowCreate(!showCreate)} className="btn-brand">
+            <Icon name={showCreate ? 'x' : 'plus'} size={16} />
+            {showCreate ? 'Cancel' : 'New Lead'}
+          </button>
+        </div>
       </div>
 
       {/* Create form */}

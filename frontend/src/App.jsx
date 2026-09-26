@@ -4,15 +4,20 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Leads from './pages/Leads';
+import KanbanLeads from './pages/KanbanLeads';
 import LeadDetail from './pages/LeadDetail';
 import Products from './pages/Products';
 import Quotations from './pages/Quotations';
 import QuotationView from './pages/QuotationView';
 import Settings from './pages/Settings';
+import Installations from './pages/Installations';
+import AIChat from './pages/AIChat';
+import Reports from './pages/Reports';
+import LocationIntelligence from './pages/LocationIntelligence';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
-  if (loading) return <div className="h-screen flex items-center justify-center">Loading...</div>;
+  if (loading) return <div className="h-screen flex items-center justify-center bg-navy-950 text-slate-400">Loading...</div>;
   if (!user) return <Navigate to="/login" />;
   return children;
 }
@@ -30,10 +35,18 @@ function AppRoutes() {
       <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
         <Route index element={<Dashboard />} />
         <Route path="leads" element={<Leads />} />
+        <Route path="leads/pipeline" element={<KanbanLeads />} />
         <Route path="leads/:id" element={<LeadDetail />} />
         <Route path="products" element={<Products />} />
         <Route path="quotations" element={<Quotations />} />
         <Route path="quotations/:id" element={<QuotationView />} />
+        <Route path="configurator" element={<Dashboard />} />
+        <Route path="pricing" element={<Products />} />
+        <Route path="followups" element={<Leads />} />
+        <Route path="installations" element={<Installations />} />
+        <Route path="ai-chat" element={<AIChat />} />
+        <Route path="reports" element={<Reports />} />
+        <Route path="location" element={<LocationIntelligence />} />
         <Route path="settings" element={<AdminRoute><Settings /></AdminRoute>} />
       </Route>
     </Routes>
